@@ -59,6 +59,7 @@ class B2GBuild(LocalesMixin, PurgeMixin,
         'update-source-manifest',
         'build',
         'build-symbols',
+        'taskcluster_json_artifacts',
         'make-updates',
         'build-update-testdata',
         'prep-upload',
@@ -1089,6 +1090,18 @@ class B2GBuild(LocalesMixin, PurgeMixin,
         self.set_buildbot_property("isOSUpdate", self.isOSUpdate)
 
         self.submit_balrog_updates(product='b2g')
+
+    def taskcluster_json_artifacts(self):
+        task_id = os.getenv("TASK_ID")
+        run_id = os.getenv("RUN_ID")
+        dirs = self.query_abs_dirs()
+        artifacts = {
+            "build": "https://queue.taskcluster.net/v1/task/{task_id}/runs/{run_id}/artifacts/public/build/{build}".format(task_id=task_id, run_id=run_id, build=self.config["target"]),
+            "symbols": "https://queue.taskcluster.net/v1/task/{task_id}/runs/{run_id}/artifacts/public/build/{symbols}".format(task_id=task_id, run_id=run_id, symbols="b2g-android-arm.tar.gz")
+        }
+
+        json.dump(artifacts, open(os.path.join(dirs["work_dir"], "artifacts.json"), "w"),
+                separators=(',',':'), sort_keys=True, indent=2)
 
 # main {{{1
 if __name__ == '__main__':

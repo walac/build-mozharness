@@ -5,6 +5,7 @@ config = {
         'checkout-sources',
         'build',
         'build-symbols',
+        'taskcluster_json_artifacts',
         'prep-upload'
     ],
     "upload": {
